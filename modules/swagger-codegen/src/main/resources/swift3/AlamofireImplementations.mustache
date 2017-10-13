@@ -71,7 +71,29 @@ open class AlamofireRequestBuilder<T>: RequestBuilder<T> {
     open func createSessionManager() -> Alamofire.SessionManager {
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = buildHeaders()
-        return Alamofire.SessionManager(configuration: configuration)
+        var policies: [String: ServerTrustPolicy] = [:]
+
+        let paths = Set([".der"].map { fileExtension in
+            Bundle.main.paths(forResourcesOfType: fileExtension, inDirectory: nil)
+        }.joined())
+
+        for path in paths
+        {
+            if let certificateData = try? Data(contentsOf: URL(fileURLWithPath: path)) as CFData, let certificate = SecCertificateCreateWithData(nil, certificateData)
+            {
+                let hostname = NSURL(fileURLWithPath: path).deletingPathExtension?.lastPathComponent
+
+                policies[hostname!] = ServerTrustPolicy.pinCertificates(
+                    certificates: [certificate],
+                    validateCertificateChain: true,
+                    validateHost: true
+                )
+            }
+        }
+
+        let trust = ServerTrustPolicyManager(policies: policies)
+
+        return Alamofire.SessionManager(configuration: configuration, serverTrustPolicyManager: trust)
     }
 
     /**
