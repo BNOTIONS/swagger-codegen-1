@@ -59,7 +59,7 @@ public enum DecodeError {
 }
 
 private var once = Int()
-class Decoders {
+open class Decoders {
     static fileprivate var decoders = Dictionary<String, ((AnyObject, AnyObject?) -> AnyObject)>()
 
     static func addDecoder<T>(clazz: T.Type, decoder: @escaping ((AnyObject, AnyObject?) -> Decoded<T>)) {
@@ -144,7 +144,7 @@ class Decoders {
         }
     }
 
-    static func decode<T>(clazz: T.Type, source: AnyObject, instance: AnyObject?) -> Decoded<T> {
+    public static func decode<T>(clazz: T.Type, source: AnyObject, instance: AnyObject?) -> Decoded<T> {
         initialize()
         if let sourceNumber = source as? NSNumber, let value = sourceNumber.int32Value as? T, T.self is Int32.Type {
             return .success(value)
