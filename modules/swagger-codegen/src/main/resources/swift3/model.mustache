@@ -24,7 +24,7 @@ public enum {{classname}}: {{dataType}} {
 }
 {{/isEnum}}
 {{^isEnum}}
-open class {{classname}}: {{#parent}}{{{parent}}}{{/parent}}{{^parent}}JSONEncodable{{/parent}} {
+open class {{classname}}: NSObject, {{#parent}}{{{parent}}}{{/parent}}{{^parent}}JSONEncodable{{/parent}} {
 
 {{#vars}}
 {{#isEnum}}
